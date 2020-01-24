@@ -1,13 +1,15 @@
 import 'package:flutter_101/models/persistManager.dart';
+import 'package:uuid/uuid.dart';
 
 class TODOList {
   String id;
   String _name;
   List<String> _todos;
 
-  TODOList({this.id, String name, List<String> todos}) {
+  TODOList({String id, String name, List<String> todos}) {
     _name = name;
     _todos = todos ?? [];
+    this.id = id ?? Uuid().v4();
   }
 
   String get name {
