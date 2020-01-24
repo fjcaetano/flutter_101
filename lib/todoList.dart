@@ -19,13 +19,13 @@ class TODOListWidget extends StatefulWidget {
 class _TODOListState extends State<TODOListWidget> {
   _addTODO(String name) {
     setState(() {
-      widget.list.todos.add(name);
+      widget.list.addTodo(name);
     });
   }
 
   _doTODO(int idx) => () {
         setState(() {
-          widget.list.todos.removeAt(idx);
+          widget.list.removeTodo(idx);
         });
       };
 
@@ -126,7 +126,7 @@ class _TODOListState extends State<TODOListWidget> {
         color: Colors.blueGrey,
         child: ListView.builder(
           padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
-          itemCount: widget.list.todos.length,
+          itemCount: widget.list.length,
           itemBuilder: (context, int idx) => FlatButton(
             onPressed: _doTODO(idx),
             child: Card(
@@ -140,7 +140,7 @@ class _TODOListState extends State<TODOListWidget> {
                       padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
                       child: Icon(Icons.remove_circle, color: Colors.red),
                     ),
-                    Text(widget.list.todos[idx],
+                    Text(widget.list.getTodo(idx),
                         style: Theme.of(context).textTheme.headline),
                   ],
                 ),

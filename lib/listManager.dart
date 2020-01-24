@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_101/models/list.dart';
+import 'package:flutter_101/models/persistManager.dart';
+import 'package:flutter_101/todoList.dart';
 
 class ListManager extends StatefulWidget {
   static const routeName = '/';
@@ -11,21 +13,30 @@ class ListManager extends StatefulWidget {
 }
 
 class _ListManagerState extends State<ListManager> {
-  List<TODOList> _lists = new List();
+  TODOListManager _listManager;
 
-  _addList(String name) {
+  initState() {
+    super.initState();
+
+    TODOListManager.load().then((lm) => setState(() {
+          _listManager = lm;
+        }));
+  }
+
+  _addList(String name) async {
     setState(() {
-      _lists.add(TODOList(name: name));
+      _listManager.add(name);
     });
   }
 
   _navigateToList(int idx) => () {
-        Navigator.pushNamed(context, '/todoList', arguments: _lists[idx]);
+        Navigator.pushNamed(context, TODOListWidget.routeName,
+            arguments: _listManager.getList(idx));
       };
 
-  _removeList(int idx) => (d) {
+  _removeList(TODOList list) => (d) {
         setState(() {
-          _lists.removeAt(idx);
+          _listManager.remove(list.id);
         });
       };
 
@@ -60,7 +71,7 @@ class _ListManagerState extends State<ListManager> {
               onPressed: () {
                 Navigator.pop(context);
                 _addList(listName);
-                _navigateToList(_lists.length);
+                _navigateToList(_listManager.length);
               })
         ],
       ),
@@ -77,25 +88,28 @@ class _ListManagerState extends State<ListManager> {
         color: Colors.blueGrey,
         child: ListView.builder(
           padding: EdgeInsets.all(20),
-          itemCount: _lists.length,
-          itemBuilder: (c, idx) => Dismissible(
-            key: Key(_lists[idx].name),
-            onDismissed: _removeList(idx),
-            direction: DismissDirection.endToStart,
-            child: Container(
-              margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: RaisedButton(
-                color: Colors.white,
-                onPressed: _navigateToList(idx),
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
-                  child: Text(_lists[idx].name,
-                      textAlign: TextAlign.right,
-                      style: Theme.of(context).textTheme.headline),
+          itemCount: _listManager?.length ?? 0,
+          itemBuilder: (c, idx) {
+            var list = _listManager.getList(idx);
+            return Dismissible(
+              key: Key(list.name),
+              onDismissed: _removeList(list),
+              direction: DismissDirection.endToStart,
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                child: RaisedButton(
+                  color: Colors.white,
+                  onPressed: _navigateToList(idx),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
+                    child: Text(list.name,
+                        textAlign: TextAlign.right,
+                        style: Theme.of(context).textTheme.headline),
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(
