@@ -36,4 +36,13 @@ class TODOList {
     _todos.removeAt(idx);
     save();
   }
+
+  rearrangeTodo(int oldIndex, int newIndex) {
+    String todo = _todos.removeAt(oldIndex);
+    if (newIndex <= _todos.length) {
+      _todos.insert(newIndex > oldIndex ? newIndex - 1 : newIndex, todo);
+    } else {
+      _todos.add(todo);
+    }
+  }
 }

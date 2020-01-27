@@ -11,8 +11,14 @@ class _TODOListViewModel {
   final String Function(String name) addTODO;
   final void Function(num idx) removeTODO;
   final void Function(String newName) rename;
+  final void Function(int oldIndex, int newIndex) reorderTODO;
 
-  _TODOListViewModel._({this.list, this.addTODO, this.removeTODO, this.rename});
+  _TODOListViewModel._(
+      {this.list,
+      this.addTODO,
+      this.removeTODO,
+      this.rename,
+      this.reorderTODO});
 
   static converter(String listId) =>
       (Store<Reducers.State> store) => _TODOListViewModel._(
@@ -22,7 +28,9 @@ class _TODOListViewModel {
           removeTODO: (i) =>
               store.dispatch(RemoveTODOAction(listId: listId, idx: i)),
           rename: (n) =>
-              store.dispatch(RenameListAction(listId: listId, newName: n)));
+              store.dispatch(RenameListAction(listId: listId, newName: n)),
+          reorderTODO: (o, n) => store.dispatch(
+              ReorderTODOListAction(listId: listId, oldIndex: o, newIndex: n)));
 }
 
 class TODOListWidget extends StatefulWidget {
@@ -129,29 +137,26 @@ class _TODOListState extends State<TODOListWidget> {
             ),
             body: Container(
               color: Colors.blueGrey,
-              child: ListView.builder(
+              child: ReorderableListView(
                 padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
-                itemCount: vm.list.length,
-                itemBuilder: (context, int idx) => FlatButton(
-                  onPressed: () => vm.removeTODO(idx),
-                  child: Card(
-                    elevation: 10,
-                    margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                    child: Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Row(
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
-                            child: Icon(Icons.remove_circle, color: Colors.red),
-                          ),
-                          Text(vm.list.getTodo(idx),
-                              style: Theme.of(context).textTheme.headline),
-                        ],
+                onReorder: vm.reorderTODO,
+                children: <Widget>[
+                  for (var i = 0; i < vm.list.length; i++)
+                    Card(
+                      key: Key(vm.list.getTodo(i)),
+                      elevation: 10,
+                      margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                      child: ListTile(
+                        title: Text(vm.list.getTodo(i),
+                            style: Theme.of(context).textTheme.headline),
+                        leading: Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
+                          child: Icon(Icons.remove_circle, color: Colors.red),
+                        ),
+                        onTap: () => vm.removeTODO(i),
                       ),
                     ),
-                  ),
-                ),
+                ],
               ),
             ),
             floatingActionButton: FloatingActionButton(

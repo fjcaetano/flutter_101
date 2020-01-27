@@ -45,6 +45,14 @@ State _renameList(State state, RenameListAction action) {
   return state;
 }
 
+State _reorderList(State state, ReorderTODOListAction action) {
+  TODOList list = state.lists[action.listId];
+  list.rearrangeTodo(action.oldIndex, action.newIndex);
+  return state;
+}
+
+/// Reducer
+
 State reducer(State state, dynamic action) {
   switch (action.type) {
     case Actions.AddList:
@@ -64,6 +72,9 @@ State reducer(State state, dynamic action) {
 
     case Actions.RenameList:
       return _renameList(state, action);
+
+    case Actions.ReorderTODOList:
+      return _reorderList(state, action);
   }
 
   return state;

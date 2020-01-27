@@ -7,7 +7,8 @@ enum Actions {
   RemoveList,
   AddTODO,
   RemoveTODO,
-  RenameList
+  RenameList,
+  ReorderTODOList,
 }
 
 class AddListAction {
@@ -57,4 +58,13 @@ class RenameListAction {
   final String newName;
 
   RenameListAction({this.listId, this.newName});
+}
+
+class ReorderTODOListAction {
+  final type = Actions.ReorderTODOList;
+  final String listId;
+  final int oldIndex;
+  final int newIndex;
+
+  ReorderTODOListAction({this.listId, this.oldIndex, this.newIndex});
 }
