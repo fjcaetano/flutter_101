@@ -1,8 +1,5 @@
 import 'package:flutter_101/models/list.dart';
-import 'package:flutter_101/models/persistManager.dart';
 import 'package:flutter_101/redux/actions.dart';
-
-import 'package:redux/redux.dart';
 
 class State {
   final Map<String, TODOList> lists;
@@ -78,17 +75,4 @@ State reducer(State state, dynamic action) {
   }
 
   return state;
-}
-
-class InitMiddleware implements MiddlewareClass<State> {
-  @override
-  dynamic call(Store<State> store, action, next) async {
-    if (action.type == Actions.LoadFromDisk && !store.state.hydrated) {
-      final lists = await TODOListPersist.loadLists();
-      return next(HydrateAction(
-          lists: Map.fromEntries(lists.map((l) => MapEntry(l.id, l)))));
-    }
-
-    next(action);
-  }
 }

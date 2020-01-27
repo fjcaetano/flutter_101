@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_101/listManager.dart';
 import 'package:flutter_101/redux/actions.dart';
+import 'package:flutter_101/redux/middlewares.dart';
 import 'package:flutter_101/redux/reducers.dart' as Reducers;
 import 'package:flutter_101/todoList.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -12,7 +13,7 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   final _store = new Store(Reducers.reducer,
       initialState: Reducers.State(hydrated: false),
-      middleware: [Reducers.InitMiddleware()]);
+      middleware: [PersistReduxMiddleware()]);
 
   // This widget is the root of your application.
   @override
