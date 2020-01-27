@@ -14,7 +14,7 @@ class TODOList {
     return _todos.length;
   }
 
-  String getTodo(int idx) => _todos[idx];
+  String operator [](int idx) => _todos[idx];
 
   addTodo(String todo) {
     _todos.add(todo);

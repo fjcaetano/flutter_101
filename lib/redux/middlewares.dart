@@ -84,7 +84,7 @@ class PersistReduxMiddleware implements MiddlewareClass<State> {
     await Future.wait([
       prefs.setString(_StorageKeys.listName(list.id), list.name),
       prefs.setStringList(_StorageKeys.listItems(list.id),
-          [for (var i = 0; i < list.length; i++) list.getTodo(i)]),
+          [for (var i = 0; i < list.length; i++) list[i]]),
       prefs.setStringList(_StorageKeys.listIds, idList.toList())
     ]);
   }

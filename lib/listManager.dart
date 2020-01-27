@@ -8,21 +8,25 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 class _ListManagerViewModel {
+  final Store<Reducers.State> store;
   final List<TODOList> lists;
-  final TODOList Function(String name) addList;
-  final void Function(TODOList list) removeList;
+  final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
-  _ListManagerViewModel({this.lists, this.addList, this.removeList});
+  _ListManagerViewModel.converter(this.store)
+      : lists = store.state.lists.values.toList();
 
-  static _ListManagerViewModel converter(Store<Reducers.State> store) =>
-      _ListManagerViewModel(
-          lists: store.state.lists.values.toList(),
-          addList: (l) {
-            var list = TODOList(name: l);
-            store.dispatch(AddListAction(list: list));
-            return list;
-          },
-          removeList: (l) => store.dispatch(RemoveListAction(listId: l.id)));
+  addList(String name) {
+    var list = TODOList(name: name);
+    store.dispatch(AddListAction(list: list));
+    listKey.currentState.insertItem(lists.length);
+    return list;
+  }
+
+  removeList(TODOList list) {
+    final idx = lists.indexOf(list);
+    listKey.currentState.removeItem(idx, (c, a) => null);
+    store.dispatch(RemoveListAction(listId: list.id));
+  }
 }
 
 class ListManager extends StatefulWidget {
@@ -70,7 +74,7 @@ class _ListManagerState extends State<ListManager> {
                   child: Text('Add'),
                   onPressed: () {
                     Navigator.pop(context);
-                    _navigateToList(vm.addList(listName));
+                    vm.addList(listName);
                   })
             ],
           ),
@@ -80,44 +84,49 @@ class _ListManagerState extends State<ListManager> {
   @override
   Widget build(BuildContext context) {
     return StoreConnector<Reducers.State, _ListManagerViewModel>(
-        converter: _ListManagerViewModel.converter,
-        builder: (c, vm) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('My Lists'),
-            ),
-            body: Container(
-              color: Colors.blueGrey,
-              child: ListView.builder(
-                padding: EdgeInsets.all(20),
-                itemCount: vm.lists.length,
-                itemBuilder: (c, idx) {
-                  return Dismissible(
+        converter: (s) => _ListManagerViewModel.converter(s),
+        onWillChange: (prevVM, newVM) {
+          if (prevVM.lists.length == 0) {
+            // hydrate the animation state
+            for (var i = 0; i < newVM.lists.length; i++) {
+              prevVM.listKey.currentState.insertItem(i);
+            }
+          }
+        },
+        builder: (c, vm) => Scaffold(
+              appBar: AppBar(
+                title: Text('My Lists'),
+              ),
+              body: Container(
+                color: Colors.blueGrey,
+                child: AnimatedList(
+                  key: vm.listKey,
+                  padding: EdgeInsets.all(20),
+                  initialItemCount: vm.lists.length, // 0
+                  itemBuilder: (c, idx, a) => FadeTransition(
                     key: Key(vm.lists[idx].name),
-                    onDismissed: (d) => vm.removeList(vm.lists[idx]),
-                    direction: DismissDirection.endToStart,
-                    child: Container(
-                      margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                      child: RaisedButton(
-                        color: Colors.white,
-                        onPressed: () => _navigateToList(vm.lists[idx]),
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
-                          child: Text(vm.lists[idx].name,
-                              textAlign: TextAlign.right,
+                    opacity: a,
+                    child: Dismissible(
+                      key: Key(vm.lists[idx].name),
+                      onDismissed: (d) => vm.removeList(vm.lists[idx]),
+                      direction: DismissDirection.endToStart,
+                      child: Card(
+                        margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                        child: ListTile(
+                          onTap: () => _navigateToList(vm.lists[idx]),
+                          title: Text(vm.lists[idx].name,
+                              textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.headline),
                         ),
                       ),
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
-            ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: _showDialogAddList(vm),
-              child: Icon(Icons.add),
-            ),
-          );
-        });
+              floatingActionButton: FloatingActionButton(
+                onPressed: _showDialogAddList(vm),
+                child: Icon(Icons.add),
+              ),
+            ));
   }
 }
