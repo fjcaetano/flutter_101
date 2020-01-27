@@ -6,29 +6,36 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:redux/redux.dart';
 
+final createAnimController = (TickerProvider vsync) => AnimationController(
+    duration: const Duration(milliseconds: 280), vsync: vsync);
+
 class _TODOListViewModel {
   final Store<Reducers.State> store;
   final TODOList list;
-  final String listId;
+  final List<AnimationController> animControllers;
+  final TickerProvider vsync;
 
-  _TODOListViewModel.converter(this.store, this.listId)
+  _TODOListViewModel.converter(
+      this.store, String listId, this.vsync, this.animControllers)
       : list = store.state.lists[listId];
 
   addTODO(String newName) {
-    store.dispatch(AddTODOAction(listId: listId, todo: newName));
+    store.dispatch(AddTODOAction(listId: list.id, todo: newName));
+    animControllers.add(createAnimController(vsync)..forward());
   }
 
-  removeTODO(num idx) {
-    store.dispatch(RemoveTODOAction(listId: listId, idx: idx));
+  removeTODO(num idx) async {
+    await animControllers.removeAt(idx).animateBack(0);
+    store.dispatch(RemoveTODOAction(listId: list.id, idx: idx));
   }
 
   rename(String newName) {
-    store.dispatch(RenameListAction(listId: listId, newName: newName));
+    store.dispatch(RenameListAction(listId: list.id, newName: newName));
   }
 
   reorderTODO(num oldIdx, num newIdx) {
     store.dispatch(ReorderTODOListAction(
-        listId: listId, oldIndex: oldIdx, newIndex: newIdx));
+        listId: list.id, oldIndex: oldIdx, newIndex: newIdx));
   }
 }
 
@@ -43,7 +50,10 @@ class TODOListWidget extends StatefulWidget {
   _TODOListState createState() => _TODOListState();
 }
 
-class _TODOListState extends State<TODOListWidget> {
+class _TODOListState extends State<TODOListWidget>
+    with TickerProviderStateMixin {
+  final List<AnimationController> animControllers = [];
+
   _showNewTODODialog(_TODOListViewModel vm) {
     String newTODO;
     showDialog<String>(
@@ -120,10 +130,36 @@ class _TODOListState extends State<TODOListWidget> {
     );
   }
 
+  _buildItem(_TODOListViewModel vm, num i) => FadeTransition(
+      key: Key(vm.list[i]),
+      opacity: Tween<double>(begin: 0, end: 1).animate(animControllers[i]),
+      child: Card(
+        elevation: 10,
+        margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+        child: ListTile(
+          title: Text(vm.list[i], style: Theme.of(context).textTheme.headline),
+          leading: Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
+            child: Icon(Icons.remove_circle, color: Colors.red),
+          ),
+          onTap: () {
+            vm.removeTODO(i);
+          },
+        ),
+      ));
+
   @override
   Widget build(BuildContext context) {
     return StoreConnector<Reducers.State, _TODOListViewModel>(
-        converter: (s) => _TODOListViewModel.converter(s, widget.listId),
+        converter: (s) => _TODOListViewModel.converter(
+            s, widget.listId, this, animControllers),
+        onInit: (store) {
+          // Probably not the best approach ¯\_(ツ)_/¯
+          animControllers.addAll([
+            for (var i = 0; i < store.state.lists[widget.listId].length; i++)
+              createAnimController(this)..value = 1
+          ]);
+        },
         builder: (c, vm) {
           return Scaffold(
             appBar: AppBar(
@@ -140,21 +176,7 @@ class _TODOListState extends State<TODOListWidget> {
                 padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
                 onReorder: vm.reorderTODO,
                 children: <Widget>[
-                  for (var i = 0; i < vm.list.length; i++)
-                    Card(
-                      key: Key(vm.list[i]),
-                      elevation: 10,
-                      margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                      child: ListTile(
-                        title: Text(vm.list[i],
-                            style: Theme.of(context).textTheme.headline),
-                        leading: Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
-                          child: Icon(Icons.remove_circle, color: Colors.red),
-                        ),
-                        onTap: () => vm.removeTODO(i),
-                      ),
-                    ),
+                  for (var i = 0; i < vm.list.length; i++) _buildItem(vm, i)
                 ],
               ),
             ),

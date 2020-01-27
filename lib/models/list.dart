@@ -5,10 +5,9 @@ class TODOList {
   String name;
   List<String> _todos;
 
-  TODOList({String id, this.name, List<String> todos}) {
-    _todos = todos ?? [];
-    this.id = id ?? Uuid().v4();
-  }
+  TODOList({String id, this.name, List<String> todos})
+      : _todos = todos ?? [],
+        this.id = id ?? Uuid().v4();
 
   num get length {
     return _todos.length;
