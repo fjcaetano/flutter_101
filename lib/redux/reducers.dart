@@ -10,43 +10,40 @@ class State {
 
 // Reducers
 
-State _addList(State state, AddListAction action) => State(lists: {
+State _addList(State state, AddListAction action) =>
+    State(hydrated: state.hydrated, lists: {
       ...state.lists,
       action.list.id: action.list,
     });
 
-State _removeList(State state, RemoveListAction action) {
-  state.lists.remove(action.listId);
-  return state;
-}
+State _removeList(State state, RemoveListAction action) =>
+    State(lists: state.lists..remove(action.listId), hydrated: state.hydrated);
 
-State _addTODO(State state, AddTODOAction action) {
-  var list = state.lists[action.listId];
-  list.addTodo(action.todo);
-  return state;
-}
+State _addTODO(State state, AddTODOAction action) =>
+    State(hydrated: state.hydrated, lists: {
+      ...state.lists,
+      action.listId: state.lists[action.listId]..addTodo(action.todo),
+    });
 
-State _removeTODO(State state, RemoveTODOAction action) {
-  var list = state.lists[action.listId];
-  list.removeTodo(action.idx);
-  return state;
-}
+State _removeTODO(State state, RemoveTODOAction action) =>
+    State(hydrated: state.hydrated, lists: {
+      ...state.lists,
+      action.listId: state.lists[action.listId]..removeTodo(action.idx),
+    });
 
-State _hydrate(State state, HydrateAction action) {
-  return State(lists: action.lists, hydrated: true);
-}
+State _hydrate(State state, HydrateAction action) =>
+    State(lists: action.lists, hydrated: true);
 
-State _renameList(State state, RenameListAction action) {
-  TODOList list = state.lists[action.listId];
-  list.name = action.newName;
-  return state;
-}
+State _renameList(State state, RenameListAction action) => State(
+    hydrated: state.hydrated,
 
-State _reorderList(State state, ReorderTODOListAction action) {
-  TODOList list = state.lists[action.listId];
-  list.rearrangeTodo(action.oldIndex, action.newIndex);
-  return state;
-}
+    /// Waaaat? I know right?
+    lists: state.lists..[action.listId].name = action.newName);
+
+State _reorderList(State state, ReorderTODOListAction action) => State(
+    hydrated: state.hydrated,
+    lists: state.lists
+      ..[action.listId].rearrangeTodo(action.oldIndex, action.newIndex));
 
 /// Reducer
 
