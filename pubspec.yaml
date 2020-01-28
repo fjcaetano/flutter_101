@@ -19,6 +19,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_nfc_reader:
+    git:
+      url: https://github.com/matteocrippa/flutter-nfc-reader
+      ref: b496fd68d5ecef358f1b7e221e7baf39af650b4a
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
