@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_101/listManager.dart';
 import 'package:flutter_101/models/appRoutes.dart';
+import 'package:flutter_101/nfcTagWidget.dart';
 import 'package:flutter_101/redux/actions.dart';
 import 'package:flutter_101/redux/middlewares/navigation.dart';
 import 'package:flutter_101/redux/middlewares/nfc.dart';
@@ -44,6 +45,9 @@ class MyApp extends StatelessWidget {
 
                     case AppRoutes.todo:
                       return TODOListWidget(listId: settings.arguments);
+
+                    case AppRoutes.NFCTag:
+                      return NFCTagWidget(data: settings.arguments);
                   }
 
                   return null;

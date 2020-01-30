@@ -1,3 +1,4 @@
+import 'package:flutter_101/models/appRoutes.dart';
 import 'package:flutter_101/redux/actions.dart';
 import 'package:flutter_101/redux/reducers.dart';
 import 'package:flutter_nfc_reader/flutter_nfc_reader.dart';
@@ -8,16 +9,14 @@ List<Middleware<State>> createNFCMiddleware() => [
       TypedMiddleware<State, StopNFCWatcherAction>(_stopNFCWatcher),
     ];
 
-void _startNFCWatcher(Store<State> store, _, __) async {
+void _startNFCWatcher(Store<State> store, _, __) {
   print('Starting watcher');
   Stream.fromFuture(FlutterNfcReader.checkNFCAvailability())
       .where((avail) => avail == NFCAvailability.available)
       .asyncExpand((_) => FlutterNfcReader.onTagDiscovered(
           instruction: 'Hold the phone near the object to be scanned'))
-      .map((d) {
-    print('DATA - $d');
-    return FoundNFCTagAction.fromData(d);
-  }).listen(store.dispatch,
+      .map((d) => NavigatePushAction(routeName: AppRoutes.NFCTag, arguments: d))
+      .listen(store.dispatch,
           onError: (e) => print('ERROR - $e'), onDone: () => print('Done'));
 }
 

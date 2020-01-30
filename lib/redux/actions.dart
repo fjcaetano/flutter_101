@@ -1,5 +1,4 @@
 import 'package:flutter_101/models/list.dart';
-import 'package:flutter_nfc_reader/flutter_nfc_reader.dart';
 
 abstract class ListIdAction {
   final String listId;
@@ -60,14 +59,6 @@ class ReorderTODOListAction extends ListIdAction {
 class StartNFCWatcherAction {}
 
 class StopNFCWatcherAction {}
-
-class FoundNFCTagAction {
-  final NfcData data;
-
-  FoundNFCTagAction._(this.data);
-
-  static fromData(NfcData data) => FoundNFCTagAction._(data);
-}
 
 // Navigation
 
