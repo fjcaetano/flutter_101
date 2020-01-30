@@ -13,7 +13,9 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   final _store = new Store(Reducers.reducer,
       initialState: Reducers.State(hydrated: false),
-      middleware: [PersistReduxMiddleware()]);
+      middleware: [
+        ...createPersistMiddleware(),
+      ]);
 
   // This widget is the root of your application.
   @override

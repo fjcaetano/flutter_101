@@ -1,3 +1,5 @@
+import 'package:redux/redux.dart';
+
 import 'package:flutter_101/models/list.dart';
 import 'package:flutter_101/redux/actions.dart';
 
@@ -17,59 +19,40 @@ State _addList(State state, AddListAction action) =>
     });
 
 State _removeList(State state, RemoveListAction action) =>
-    State(lists: state.lists..remove(action.listId), hydrated: state.hydrated);
+    State(lists: {...state.lists}, hydrated: state.hydrated)
+      ..lists.remove(action.listId);
 
 State _addTODO(State state, AddTODOAction action) =>
     State(hydrated: state.hydrated, lists: {
       ...state.lists,
-      action.listId: state.lists[action.listId]..addTodo(action.todo),
-    });
+    })
+      ..lists[action.listId].addTodo(action.todo);
 
 State _removeTODO(State state, RemoveTODOAction action) =>
     State(hydrated: state.hydrated, lists: {
       ...state.lists,
-      action.listId: state.lists[action.listId]..removeTodo(action.idx),
-    });
+    })
+      ..lists[action.listId].removeTodo(action.idx);
 
 State _hydrate(State state, HydrateAction action) =>
     State(lists: action.lists, hydrated: true);
 
-State _renameList(State state, RenameListAction action) => State(
-    hydrated: state.hydrated,
+State _renameList(State state, RenameListAction action) =>
+    State(hydrated: state.hydrated, lists: {...state.lists})
+      ..lists[action.listId].name = action.newName;
 
-    /// Waaaat? I know right?
-    lists: state.lists..[action.listId].name = action.newName);
-
-State _reorderList(State state, ReorderTODOListAction action) => State(
-    hydrated: state.hydrated,
-    lists: state.lists
-      ..[action.listId].rearrangeTodo(action.oldIndex, action.newIndex));
+State _reorderList(State state, ReorderTODOListAction action) =>
+    State(hydrated: state.hydrated, lists: {...state.lists})
+      ..lists[action.listId].rearrangeTodo(action.oldIndex, action.newIndex);
 
 /// Reducer
 
-State reducer(State state, dynamic action) {
-  switch (action.type) {
-    case Actions.AddList:
-      return _addList(state, action);
-
-    case Actions.RemoveList:
-      return _removeList(state, action);
-
-    case Actions.AddTODO:
-      return _addTODO(state, action);
-
-    case Actions.RemoveTODO:
-      return _removeTODO(state, action);
-
-    case Actions.Hydrate:
-      return _hydrate(state, action);
-
-    case Actions.RenameList:
-      return _renameList(state, action);
-
-    case Actions.ReorderTODOList:
-      return _reorderList(state, action);
-  }
-
-  return state;
-}
+final reducer = combineReducers<State>([
+  TypedReducer<State, AddListAction>(_addList),
+  TypedReducer<State, RemoveListAction>(_removeList),
+  TypedReducer<State, AddTODOAction>(_addTODO),
+  TypedReducer<State, RemoveTODOAction>(_removeTODO),
+  TypedReducer<State, HydrateAction>(_hydrate),
+  TypedReducer<State, RenameListAction>(_renameList),
+  TypedReducer<State, ReorderTODOListAction>(_reorderList),
+]);

@@ -1,70 +1,57 @@
 import 'package:flutter_101/models/list.dart';
 
-enum Actions {
-  LoadFromDisk,
-  Hydrate,
-  AddList,
-  RemoveList,
-  AddTODO,
-  RemoveTODO,
-  RenameList,
-  ReorderTODOList,
+abstract class ListIdAction {
+  final String listId;
+
+  ListIdAction({this.listId});
 }
 
-class AddListAction {
-  final type = Actions.AddList;
+class ListAction {
   final TODOList list;
 
-  AddListAction({this.list});
+  ListAction({this.list});
+}
+
+class AddListAction extends ListAction {
+  AddListAction({TODOList list}) : super(list: list);
 }
 
 class RemoveListAction {
-  final type = Actions.RemoveList;
   final String listId;
 
   RemoveListAction({this.listId});
 }
 
-class AddTODOAction {
-  final type = Actions.AddTODO;
-  final String listId;
+class AddTODOAction extends ListIdAction {
   final String todo;
 
-  AddTODOAction({this.listId, this.todo});
+  AddTODOAction({String listId, this.todo}) : super(listId: listId);
 }
 
-class RemoveTODOAction {
-  final type = Actions.RemoveTODO;
-  final String listId;
+class RemoveTODOAction extends ListIdAction {
   final num idx;
 
-  RemoveTODOAction({this.listId, this.idx});
+  RemoveTODOAction({String listId, this.idx}) : super(listId: listId);
 }
 
-class LoadFromDiskAction {
-  final type = Actions.LoadFromDisk;
-}
+class LoadFromDiskAction {}
 
 class HydrateAction {
-  final type = Actions.Hydrate;
   final Map<String, TODOList> lists;
 
   HydrateAction({this.lists});
 }
 
-class RenameListAction {
-  final type = Actions.RenameList;
-  final String listId;
+class RenameListAction extends ListIdAction {
   final String newName;
 
-  RenameListAction({this.listId, this.newName});
+  RenameListAction({String listId, this.newName}) : super(listId: listId);
 }
 
-class ReorderTODOListAction {
-  final type = Actions.ReorderTODOList;
-  final String listId;
+class ReorderTODOListAction extends ListIdAction {
   final int oldIndex;
   final int newIndex;
 
-  ReorderTODOListAction({this.listId, this.oldIndex, this.newIndex});
+  ReorderTODOListAction({String listId, this.oldIndex, this.newIndex})
+      : super(listId: listId);
 }
