@@ -68,3 +68,20 @@ class FoundNFCTagAction {
 
   static fromData(NfcData data) => FoundNFCTagAction._(data);
 }
+
+// Navigation
+
+class NavigateReplaceAction {
+  final String routeName;
+
+  NavigateReplaceAction({this.routeName});
+}
+
+class NavigatePushAction {
+  final String routeName;
+  final Object arguments;
+
+  NavigatePushAction({this.routeName, this.arguments});
+}
+
+class NavigatePopAction {}

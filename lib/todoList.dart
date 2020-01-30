@@ -40,8 +40,6 @@ class _TODOListViewModel {
 }
 
 class TODOListWidget extends StatefulWidget {
-  static const routeName = '/todoList';
-
   final String listId;
 
   TODOListWidget({Key key, this.listId}) : super(key: key);

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_101/models/appRoutes.dart';
 import 'package:flutter_101/models/list.dart';
 import 'package:flutter_101/redux/actions.dart';
 import 'package:flutter_101/redux/reducers.dart' as Reducers;
-import 'package:flutter_101/todoList.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:redux/redux.dart';
@@ -27,11 +27,14 @@ class _ListManagerViewModel {
     listKey.currentState.removeItem(idx, (c, a) => null);
     store.dispatch(RemoveListAction(listId: list.id));
   }
+
+  void navigateToTODO(String listId) {
+    store.dispatch(
+        NavigatePushAction(routeName: AppRoutes.todo, arguments: listId));
+  }
 }
 
 class ListManager extends StatefulWidget {
-  static const routeName = '/';
-
   ListManager({Key key}) : super(key: key);
 
   @override
@@ -39,10 +42,6 @@ class ListManager extends StatefulWidget {
 }
 
 class _ListManagerState extends State<ListManager> {
-  _navigateToList(TODOList list) {
-    Navigator.pushNamed(context, TODOListWidget.routeName, arguments: list.id);
-  }
-
   _showDialogAddList(_ListManagerViewModel vm) => () {
         String listName;
         showDialog<String>(
@@ -113,7 +112,7 @@ class _ListManagerState extends State<ListManager> {
                       child: Card(
                         margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
                         child: ListTile(
-                          onTap: () => _navigateToList(vm.lists[idx]),
+                          onTap: () => vm.navigateToTODO(vm.lists[idx].id),
                           title: Text(vm.lists[idx].name,
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.headline),
