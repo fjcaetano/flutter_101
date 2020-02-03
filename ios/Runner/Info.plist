@@ -52,5 +52,7 @@
 	<array>
 		<string>12FC</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Beacons</string>
 </dict>
 </plist>

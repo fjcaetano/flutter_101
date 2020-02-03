@@ -1,33 +1,46 @@
 PODS:
+  - beacons (0.0.1):
+    - Flutter
+    - streams_channel
   - Flutter (1.0.0)
   - flutter_nfc_reader (0.0.1):
     - Flutter
     - VYNFCKit
   - shared_preferences (0.0.1):
     - Flutter
+  - streams_channel (0.2.1):
+    - Flutter
   - VYNFCKit (0.3.2)
 
 DEPENDENCIES:
+  - beacons (from `.symlinks/plugins/beacons/ios`)
   - Flutter (from `Flutter`)
   - flutter_nfc_reader (from `.symlinks/plugins/flutter_nfc_reader/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
+  - streams_channel (from `.symlinks/plugins/streams_channel/ios`)
 
 SPEC REPOS:
   trunk:
     - VYNFCKit
 
 EXTERNAL SOURCES:
+  beacons:
+    :path: ".symlinks/plugins/beacons/ios"
   Flutter:
     :path: Flutter
   flutter_nfc_reader:
     :path: ".symlinks/plugins/flutter_nfc_reader/ios"
   shared_preferences:
     :path: ".symlinks/plugins/shared_preferences/ios"
+  streams_channel:
+    :path: ".symlinks/plugins/streams_channel/ios"
 
 SPEC CHECKSUMS:
+  beacons: 60df21535d586bfa2a4b502f8fe20cda97f27073
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_nfc_reader: 67d71071d779d28b827ea50dcbe00d09286f253d
   shared_preferences: 1feebfa37bb57264736e16865e7ffae7fc99b523
+  streams_channel: 733858967fb8b62e0d63a1d03f6b8f0cb7d3bfc2
   VYNFCKit: 86a9b711fd1f34f6f7128a2a883cd58dbd781b9d
 
 PODFILE CHECKSUM: 1b66dae606f75376c5f2135a8290850eeb09ae83
