@@ -1,4 +1,5 @@
 import 'package:flutter_101/models/list.dart';
+import 'package:flutter_beacon/flutter_beacon.dart';
 
 abstract class ListIdAction {
   final String listId;
@@ -76,3 +77,25 @@ class NavigatePushAction {
 }
 
 class NavigatePopAction {}
+
+class StartScanningBeconsAction {
+  final List<Region> regions;
+
+  StartScanningBeconsAction({this.regions});
+}
+
+class DidFoundBeaconAction {
+  final RangingResult result;
+
+  DidFoundBeaconAction({this.result});
+}
+
+class BeaconErrorAction {
+  final Error error;
+
+  BeaconErrorAction({this.error});
+}
+
+class StopScanningBeaconsAction {}
+
+class DiscardBeaconsResultAction {}

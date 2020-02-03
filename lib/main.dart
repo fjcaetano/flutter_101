@@ -3,11 +3,13 @@ import 'package:flutter_101/listManager.dart';
 import 'package:flutter_101/models/appRoutes.dart';
 import 'package:flutter_101/nfcTagWidget.dart';
 import 'package:flutter_101/redux/actions.dart';
+import 'package:flutter_101/redux/middlewares/beacons.dart';
 import 'package:flutter_101/redux/middlewares/navigation.dart';
 import 'package:flutter_101/redux/middlewares/nfc.dart';
 import 'package:flutter_101/redux/middlewares/persist.dart';
 import 'package:flutter_101/redux/reducers.dart' as Reducers;
 import 'package:flutter_101/todoList.dart';
+import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:redux/redux.dart';
@@ -17,11 +19,17 @@ final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
   final _store = new Store(Reducers.reducer,
-      initialState: Reducers.State(hydrated: false, routes: [AppRoutes.home]),
+      initialState: Reducers.State(
+          hydrated: false, routes: [AppRoutes.home], foundBeacons: {}),
       middleware: [
+        (dynamic _, dynamic action, NextDispatcher next) {
+          print('Dispatched redux action: $action');
+          next(action);
+        },
         ...createPersistMiddleware(),
         ...createNFCMiddleware(),
-        ...createNavigationMiddleware()
+        ...createNavigationMiddleware(),
+        ...createBeaconsMiddleware(),
       ]);
 
   // This widget is the root of your application.
@@ -29,6 +37,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     _store.dispatch(LoadFromDiskAction());
     _store.dispatch(StartNFCWatcherAction());
+    _store.dispatch(StartScanningBeconsAction(regions: [
+      Region(
+        identifier: 'Beacon',
+        proximityUUID: 'B9407F30-F5F8-466E-AFF9-25556B57FE6D',
+      )
+    ]));
     return StoreProvider(
         store: _store,
         child: MaterialApp(
